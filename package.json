@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "description": "PantryPal REST API for the single-pantry MVP",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
@@ -17,7 +19,8 @@
     "express": "5.1.0",
     "helmet": "8.1.0",
     "pg": "8.16.3",
-    "zod": "4.1.12"
+    "zod": "4.1.12",
+    "dotenv": "17.2.3"
   },
   "devDependencies": {
     "@types/cors": "2.8.19",
