@@ -1,39 +1,54 @@
 # ppal-api
 
-Core de negocio: la API que expone las reglas del dominio.
+PantryPal's REST API is the only component allowed to read or write PostgreSQL. It validates product input and exposes the product endpoints defined by the project contract.
 
-Forma parte del proyecto **PantryPal** (`ppal`) — Ingeniería para el Desarrollo Móvil (posgrado) · CORHUILA 2026-B.
+## MVP boundaries
 
-| | |
-|---|---|
-| Rol | Core de negocio (API) |
-| Contenerizado | Sí: se entrega con su `Dockerfile`. |
-| Gobierno y documentación | [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) |
-| Backlog | GitHub Project `ppal-backlog` |
+- One demonstration pantry; no accounts, login, tokens, or per-user isolation.
+- Online-only operations. Network failures are errors, never an empty inventory.
+- Intended for local development and controlled demonstrations only. Do not expose this unauthenticated API as a public multi-user service or store sensitive personal data.
 
-## Ramas
+## Endpoints
 
-| Rama | Uso |
-|---|---|
-| `develop` | Integración (rama por defecto) |
-| `qa` | Pruebas |
-| `main` | Producción |
+| Method | Path | Purpose |
+|---|---|---|
+| GET | /health | Liveness check |
+| GET | /api/products | List products ordered by expiration date, undated records last |
+| GET | /api/products/{id} | Retrieve one product |
+| POST | /api/products | Validate and create a product |
+| PUT | /api/products/{id} | Validate and update a product |
+| DELETE | /api/products/{id} | Delete a product |
 
-**Todo cambio a `develop`, `qa` o `main` entra por pull request.** Ninguna de las tres admite
-commits directos, force-push ni borrado (tampoco para administradores).
+Successful create returns 201, update returns 200, and delete returns 204. Validation errors use an error envelope with fieldErrors. Unknown IDs return 404. The API never accepts client-supplied IDs or timestamps.
 
-1. Trabajo diario: rama `feat/<tema>` o `fix/<tema>` desde `develop` → PR a `develop`.
-2. Promoción: PR `develop` → `qa` y PR `qa` → `main`.
-3. El PR a `main` necesita la aprobación del docente. La rama de trabajo se borra al fusionar.
+## Product rules
 
-## Repositorios del proyecto
+- Name must be nonblank and at most 120 characters.
+- Quantity must be finite and greater than zero. Units and Packages require integer quantities.
+- Unit/category values are fixed by the MVP domain model.
+- expirationDate is nullable and must be a real YYYY-MM-DD calendar date when present.
+- The API validates requests independently of the mobile client.
 
-| Repositorio | Rol |
-|---|---|
-| [`ppal-docs`](https://github.com/code-corhuila/ppal-docs) | Gobierno único del proyecto |
-| [`ppal-api`](https://github.com/code-corhuila/ppal-api) | Core de negocio (API) |
-| [`ppal-app`](https://github.com/code-corhuila/ppal-app) | Aplicación móvil |
-| [`ppal-portal`](https://github.com/code-corhuila/ppal-portal) | Portal web |
-| [`ppal-db`](https://github.com/code-corhuila/ppal-db) | Migraciones de base de datos |
-| [`ppal-infra`](https://github.com/code-corhuila/ppal-infra) | Infraestructura y orquestación |
-| [`ppal-tools`](https://github.com/code-corhuila/ppal-tools) | Paquete de herramientas |
+## Run locally
+
+Requirements: Node.js 22+ and PostgreSQL, or the Docker Compose stack from ppal-infra.
+
+1. Copy .env.example to .env and set DATABASE_URL for your local database.
+2. Install dependencies with npm install.
+3. Run npm test.
+4. Run npm run build.
+5. Start the development server with npm run dev.
+
+The container uses the included Dockerfile. The database migration and demo seed are maintained in ppal-db.
+
+## Tests
+
+The current test suite exercises the HTTP contract with an in-memory repository. These tests do not replace PostgreSQL integration tests; those are a follow-up once the local Compose stack is running.
+
+## Configuration
+
+- PORT defaults to 3000.
+- DATABASE_URL is required.
+- CORS_ORIGINS is a comma-separated allowlist for local browser and Capacitor origins.
+
+Do not commit .env files, passwords, or production credentials.
