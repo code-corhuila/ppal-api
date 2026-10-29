@@ -24,7 +24,7 @@ Successful create returns 201, update returns 200, and delete returns 204. Valid
 ## Product rules
 
 - Name must be nonblank and at most 120 characters.
-- Quantity must be finite and greater than zero. Units and Packages require integer quantities.
+- Quantity must be finite, greater than zero, and have at most three decimal places. Units and Packages require integer quantities.
 - Unit/category values are fixed by the MVP domain model.
 - expirationDate is nullable and must be a real YYYY-MM-DD calendar date when present.
 - The API validates requests independently of the mobile client.
