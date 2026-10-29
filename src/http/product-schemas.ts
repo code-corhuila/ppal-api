@@ -41,7 +41,7 @@ export const productInputSchema = z.object({
 
 export type ValidProductInput = z.output<typeof productInputSchema>;
 
-export function formatValidationIssues(issues: z.core.$ZodIssue[]) {
+export function formatValidationIssues(issues: ReadonlyArray<{ path: readonly unknown[]; message: string }>) {
   const fieldErrors: Record<string, string> = {};
   for (const issue of issues) {
     const field = issue.path[0];
