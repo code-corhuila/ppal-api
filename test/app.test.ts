@@ -122,4 +122,17 @@ describe('PantryPal products API', () => {
     expect(response.status).toBe(400);
     expect(response.body.error.fieldErrors.expirationDate).toBeDefined();
   });
+
+  it('rejects quantity precision beyond the database scale', async () => {
+    const response = await request(createApp(new InMemoryProductRepository())).post('/api/products').send({
+      name: 'Olive Oil',
+      quantity: 1.2345,
+      unit: 'L',
+      category: 'pantry_staples',
+      expirationDate: null
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.fieldErrors.quantity).toBe('Quantity supports up to three decimal places.');
+  });
 });
