@@ -84,4 +84,42 @@ describe('PantryPal products API', () => {
     expect(response.status).toBe(404);
     expect(response.body.error.code).toBe('PRODUCT_NOT_FOUND');
   });
+
+  it('updates an existing product and allows clearing its expiration date', async () => {
+    const repository = new InMemoryProductRepository();
+    const response = await request(createApp(repository))
+      .put('/api/products/' + sample.id)
+      .send({
+        name: 'Whole Milk',
+        quantity: 2,
+        unit: 'L',
+        category: 'dairy',
+        expirationDate: null
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.quantity).toBe(2);
+    expect(response.body.expirationDate).toBeNull();
+  });
+
+  it('deletes an existing product with a 204 response', async () => {
+    const repository = new InMemoryProductRepository();
+    const response = await request(createApp(repository)).delete('/api/products/' + sample.id);
+
+    expect(response.status).toBe(204);
+    expect(repository.products).toHaveLength(0);
+  });
+
+  it('rejects an impossible expiration calendar date', async () => {
+    const response = await request(createApp(new InMemoryProductRepository())).post('/api/products').send({
+      name: 'Milk',
+      quantity: 1,
+      unit: 'unit',
+      category: 'dairy',
+      expirationDate: '2026-02-30'
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.fieldErrors.expirationDate).toBeDefined();
+  });
 });
