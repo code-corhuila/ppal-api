@@ -26,7 +26,7 @@ function toProduct(row: ProductRow): Product {
   };
 }
 
-const productColumns = 'id, name, quantity, unit, category, expiration_date AS "expirationDate", created_at AS "createdAt", updated_at AS "updatedAt"';
+const productColumns = 'id, name, quantity, unit, category, to_char(expiration_date, \'YYYY-MM-DD\') AS "expirationDate", created_at AS "createdAt", updated_at AS "updatedAt"';
 
 export class PostgresProductRepository implements ProductRepository {
   constructor(private readonly pool: Pool) {}
