@@ -37,6 +37,13 @@ export const productInputSchema = z.object({
       message: 'Quantity is above the supported maximum.'
     });
   }
+  if (Math.abs(value.quantity - Math.round(value.quantity * 1000) / 1000) > 1e-9) {
+    context.addIssue({
+      code: 'custom',
+      path: ['quantity'],
+      message: 'Quantity supports up to three decimal places.'
+    });
+  }
 }).transform((value) => ({ ...value, expirationDate: value.expirationDate ?? null }));
 
 export type ValidProductInput = z.output<typeof productInputSchema>;
