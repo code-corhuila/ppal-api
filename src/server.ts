@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Pool } from 'pg';
 import { createApp } from './app.js';
 import { PostgresProductRepository } from './infrastructure/postgres-product-repository.js';
