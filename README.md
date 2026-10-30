@@ -27,6 +27,7 @@ Successful create returns 201, update returns 200, and delete returns 204. Valid
 - Quantity must be finite, greater than zero, and have at most three decimal places. Units and Packages require integer quantities.
 - Unit/category values are fixed by the MVP domain model.
 - expirationDate is nullable and must be a real YYYY-MM-DD calendar date when present.
+- List and single-product responses serialize PostgreSQL DATE values as YYYY-MM-DD, not midnight-UTC timestamps. This preserves the date-only contract and avoids timezone/mapping errors in the mobile client.
 - The API validates requests independently of the mobile client.
 
 ## Run locally
@@ -43,7 +44,7 @@ The container uses the included Dockerfile. The database migration and demo seed
 
 ## Tests
 
-The current test suite exercises the HTTP contract with an in-memory repository. These tests do not replace PostgreSQL integration tests; those are a follow-up once the local Compose stack is running.
+The automated test suite exercises the HTTP contract with an in-memory repository (9 tests passed locally on 2026-10-29). These tests do not replace automated PostgreSQL integration tests. A manual local smoke test using the ppal-infra Compose stack verified the real PostgreSQL-backed list endpoint and the mobile create, update, and delete path; this manual evidence is not a replacement for an automated integration test. GitHub Actions jobs are currently blocked before their steps start due to an account billing lock, so no hosted CI pass is claimed.
 
 ## Configuration
 
